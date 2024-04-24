@@ -3,15 +3,19 @@ package user
 import (
 	"github.com/gin-gonic/gin"
 	"sample-project/cmd/app/options"
+	"sample-project/pkg/controller"
 )
 
 type userRouter struct {
+	c controller.SampleInterface
 }
 
 func NewRouter(o *options.ServerRunOptions) {
-	router := &userRouter{}
-	router.initRoutes(o.HttpEngine)
+	router := &userRouter{
+		o.Control,
+	}
 
+	router.initRoutes(o.HttpEngine)
 }
 
 func (u *userRouter) initRoutes(httpEngine *gin.Engine) {

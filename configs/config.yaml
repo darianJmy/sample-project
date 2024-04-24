@@ -1,0 +1,11 @@
+default:
+  mode: debug
+  listen: 8888
+  autoMigrate: true
+
+mysql:
+  host: 192.168.159.130
+  user: sample
+  password: 123456
+  port: 3306
+  name: sample

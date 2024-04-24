@@ -1,16 +1,25 @@
 package controller
 
-import "sample-project/cmd/app/config"
+import (
+	"sample-project/cmd/app/config"
+	"sample-project/pkg/controller/user"
+	"sample-project/pkg/db"
+)
 
 type SampleInterface interface {
+	user.UserGetter
 }
 
 type sample struct {
-	cc config.Config
+	cc      config.Config
+	factory db.ShareDaoFactory
 }
 
-func New(cfg config.Config) SampleInterface {
+func (s *sample) User() user.Interface { return user.NewUser(s.cc, s.factory) }
+
+func New(cfg config.Config, f db.ShareDaoFactory) SampleInterface {
 	return &sample{
-		cfg,
+		cc:      cfg,
+		factory: f,
 	}
 }

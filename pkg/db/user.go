@@ -18,7 +18,7 @@ func (u *user) Create(ctx context.Context, object *model.User) (*model.User, err
 	if err := u.db.Create(object).Error; err != nil {
 		return nil, err
 	}
-	return nil, nil
+	return object, nil
 }
 
 func newUser(db *gorm.DB) *user {

@@ -42,7 +42,7 @@ func NewSampleServerCommand() *cobra.Command {
 
 func Run(opts *options.ServerRunOptions) error {
 	srv := &http.Server{
-		Addr:    fmt.Sprintln(":", opts.ComponentConfig.Default.Listen),
+		Addr:    fmt.Sprintf(":%d", opts.ComponentConfig.Default.Listen),
 		Handler: opts.HttpEngine,
 	}
 

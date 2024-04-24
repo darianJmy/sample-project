@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm/logger"
 	"io/ioutil"
 	"sample-project/cmd/app/config"
+	"sample-project/pkg/controller"
 	"sample-project/pkg/db"
 )
 
@@ -27,6 +28,9 @@ type ServerRunOptions struct {
 
 	// mysql interface
 	Factory db.ShareDaoFactory
+
+	// controller interface
+	Control controller.SampleInterface
 }
 
 func NewServerRunOptions() *ServerRunOptions {
@@ -38,23 +42,32 @@ func NewServerRunOptions() *ServerRunOptions {
 	return &s
 }
 
+// Complete read configuration
 func (s *ServerRunOptions) Complete() error {
+	var componentConfig config.Config
+
 	data, err := ioutil.ReadFile(s.ConfigFile)
 	if err != nil {
 		return err
 	}
 
-	if err := yaml.Unmarshal(data, s.ComponentConfig); err != nil {
+	if err := yaml.Unmarshal(data, &componentConfig); err != nil {
 		return err
 	}
+
+	s.ComponentConfig = componentConfig
 
 	return nil
 }
 
+// Registry register service
 func (s *ServerRunOptions) Registry() error {
 	if err := s.registerDatabase(); err != nil {
 		return err
 	}
+
+	s.Control = controller.New(s.ComponentConfig, s.Factory)
+
 	return nil
 }
 
@@ -81,9 +94,11 @@ func (s *ServerRunOptions) registerDatabase() error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
+// BindFlags use cobra flags
 func (s *ServerRunOptions) BindFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&s.ConfigFile, "file", s.ConfigFile, "The location of the sample configuration file")
 }
