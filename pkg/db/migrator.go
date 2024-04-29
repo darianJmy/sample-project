@@ -2,19 +2,10 @@ package db
 
 import (
 	"gorm.io/gorm"
-	"sample-project/pkg/db/model"
 )
 
 type migrator struct {
 	db *gorm.DB
-}
-
-func (m *migrator) AutoMigrate() error {
-	dst := []interface{}{
-		&model.User{},
-	}
-
-	return m.CreateTables(dst...)
 }
 
 func (m *migrator) CreateTables(dst ...interface{}) error {

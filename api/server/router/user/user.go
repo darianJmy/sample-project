@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"sample-project/cmd/app/options"
 	"sample-project/pkg/controller"
 )
@@ -26,5 +27,12 @@ func (u *userRouter) initRoutes(httpEngine *gin.Engine) {
 		userRoute.DELETE("/:userId", u.deleteUser)
 		userRoute.GET("/:userId", u.getUser)
 		userRoute.GET("", u.listUsers)
+
+		// login
+		userRoute.POST("/login", u.login)
+		// change password
+
+		userRoute.PUT("/change/password/:userId", u.changePassword)
+		userRoute.PUT("/reset/password/:userId", u.resetPassword)
 	}
 }

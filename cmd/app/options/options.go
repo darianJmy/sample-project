@@ -2,13 +2,15 @@ package options
 
 import (
 	"fmt"
+	"io/ioutil"
+
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"io/ioutil"
+
 	"sample-project/cmd/app/config"
 	"sample-project/pkg/controller"
 	"sample-project/pkg/db"
@@ -27,7 +29,7 @@ type ServerRunOptions struct {
 	HttpEngine *gin.Engine
 
 	// mysql interface
-	Factory db.ShareDaoFactory
+	Factory *db.ShareDaoFactory
 
 	// controller interface
 	Control controller.SampleInterface
