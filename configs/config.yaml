@@ -4,8 +4,8 @@ default:
   autoMigrate: true
 
 mysql:
-  host: 192.168.159.130
-  user: sample
+  host: 192.168.3.150
+  user: root
   password: 123456
   port: 3306
   name: sample

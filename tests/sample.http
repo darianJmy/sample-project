@@ -19,7 +19,7 @@ Content-Type: application/json
 {
   "name": {{userName}},
   "password": {{userPassword}},
-  "description": "测试用户"
+  "description": "超级管理员"
 }
 
 ### 修改用户信息
@@ -94,8 +94,8 @@ Content-Type: application/json
 {
   "url": {{menuURL}},
   "name": {{menuName}},
-  "method": "POST",
-  "description": "基础信息创建权限"
+  "method": "GET",
+  "description": "基础信息查看权限"
 }
 
 ### 更新菜单
@@ -119,13 +119,19 @@ POST http://{{host}}:{{port}}/roles/{{roleId}}/menus
 Content-Type: application/json
 
 {
-  "menu_ids": [1,2]
+  "menu_ids": [2]
 }
 
 ### 测试端口
 GET http://{{host}}:{{port}}/info
 Content-Type: application/json
-Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTQ0OTA4MzgsIm5iZiI6MTcxNDQ2OTIzOCwiaWF0IjoxNzE0NDY5MjM4LCJpZCI6MSwibmFtZSI6ImppbW15Iiwicm9sZSI6IiJ9.ZE5EcQOhrLWAOOEfuZw56AEK2yMt99i4g_HvBiCuXO8"
+Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTQ1MTY4MzUsIm5iZiI6MTcxNDQ5NTIzNSwiaWF0IjoxNzE0NDk1MjM1LCJpZCI6MSwibmFtZSI6ImppbW15Iiwicm9sZSI6IiJ9.RmwdEwQO9Vt_b378Z7EbPRtUVluRibD4jbNDTM0IO_U"
+
+### 测试端口
+POST http://{{host}}:{{port}}/info
+Content-Type: application/json
+Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTQ1MTY4MzUsIm5iZiI6MTcxNDQ5NTIzNSwiaWF0IjoxNzE0NDk1MjM1LCJpZCI6MSwibmFtZSI6ImppbW15Iiwicm9sZSI6IiJ9.RmwdEwQO9Vt_b378Z7EbPRtUVluRibD4jbNDTM0IO_U"
+
 
 
 ### 用户绑定角色

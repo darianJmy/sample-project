@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -51,5 +52,5 @@ func ParseToken(tokenStr string) (*Claims, error) {
 		return claims, nil
 	}
 
-	return nil, fmt.Errorf("failed to parse invailed token")
+	return nil, errors.New("failed to parse invalided token")
 }

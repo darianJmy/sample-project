@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
 	"sample-project/api/server/httputils"
 	"sample-project/tools"
+	"strconv"
 	"strings"
 )
 
@@ -14,50 +16,37 @@ func (m *middleware) authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		r := httputils.NewResponse()
 
+		if os.Getenv("DEBUG") == "true" {
+			return
+		}
+
 		path := c.Request.URL.Path
 		if path == "/users/login" {
 			return
 		}
 
 		method := c.Request.Method
-		token := c.GetHeader("Authorization")
-		if token == "" {
+		auth := c.GetHeader("Authorization")
+
+		if len(auth) == 0 || auth == "" {
 			r.SetCode(http.StatusUnauthorized)
 			httputils.SetFailed(c, r, errors.New("permission denied"))
 			c.Abort()
 			return
 		}
 
-		parts := strings.SplitN(token, " ", 2)
-		if !(len(parts) == 2 && parts[0] == "Bearer") {
+		auth = strings.TrimLeft(auth, "\"")
+		auth = strings.TrimRight(auth, "\"")
+
+		fields := strings.Fields(auth)
+		if len(fields) != 2 || fields[0] != "Bearer" {
 			r.SetCode(http.StatusUnauthorized)
-			httputils.SetFailed(c, r, errors.New("permission denied"))
+			httputils.SetFailed(c, r, errors.New("invalid authorization header format"))
 			c.Abort()
 			return
 		}
 
-		fmt.Println(token)
-
-		fields := strings.Fields(token)
-		if len(fields) != 2 {
-			r.SetCode(http.StatusUnauthorized)
-			httputils.SetFailed(c, r, fmt.Errorf("invalid authorization header format"))
-			c.Abort()
-			return
-		}
-
-		fmt.Println(fields)
-		if fields[0] != "Bearer" {
-			r.SetCode(http.StatusUnauthorized)
-			httputils.SetFailed(c, r, fmt.Errorf("unsupported authorization type"))
-			c.Abort()
-			return
-		}
-
-		fmt.Println("已经过了吧")
-
-		accessToken := fields[1]
-		claims, err := tools.ParseToken(accessToken)
+		claims, err := tools.ParseToken(fields[1])
 		if err != nil {
 			r.SetCode(http.StatusUnauthorized)
 			httputils.SetFailed(c, r, err)
@@ -65,7 +54,9 @@ func (m *middleware) authentication() gin.HandlerFunc {
 			return
 		}
 
-		ok, err := m.enforcer.Enforce(claims.Id, path, method)
+		fmt.Println(claims.Id, path, method)
+
+		ok, err := m.enforcer.Enforce(strconv.FormatInt(claims.Id, 10), path, method)
 		if err != nil {
 			r.SetCode(http.StatusInternalServerError)
 			httputils.SetFailed(c, r, errors.New("inner error"))
@@ -79,7 +70,5 @@ func (m *middleware) authentication() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
-		fmt.Println("已经过了吧")
 	}
 }
