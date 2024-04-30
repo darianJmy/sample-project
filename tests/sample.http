@@ -1,15 +1,15 @@
 @host=127.0.0.1
 @port=8888
-@userId=15
-@userName="x"
+@userId=1
+@userName="jimmy"
 @userPassword="123456"
 @userCurrentPassword="654321"
 
-@roleName="超级管理员"
-@roleId=5
+@roleName="admin"
+@roleId=1
 
-@menuURL="test"
-@menuName="测试"
+@menuURL="/info"
+@menuName="信息"
 @menuId=1
 
 ### 创建用户
@@ -67,7 +67,8 @@ POST http://{{host}}:{{port}}/roles
 Content-Type: application/json
 
 {
-  "name": {{roleName}}
+  "name": {{roleName}},
+  "description": "超级管理员"
 }
 
 ### 更新角色
@@ -92,7 +93,9 @@ Content-Type: application/json
 
 {
   "url": {{menuURL}},
-  "name": {{menuName}}
+  "name": {{menuName}},
+  "method": "POST",
+  "description": "基础信息创建权限"
 }
 
 ### 更新菜单
@@ -110,3 +113,25 @@ Content-Type: application/json
 ### 获取菜单列表
 GET http://{{host}}:{{port}}/menus
 Content-Type: application/json
+
+### 角色绑定菜单
+POST http://{{host}}:{{port}}/roles/{{roleId}}/menus
+Content-Type: application/json
+
+{
+  "menu_ids": [1,2]
+}
+
+### 测试端口
+GET http://{{host}}:{{port}}/info
+Content-Type: application/json
+Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTQ0OTA4MzgsIm5iZiI6MTcxNDQ2OTIzOCwiaWF0IjoxNzE0NDY5MjM4LCJpZCI6MSwibmFtZSI6ImppbW15Iiwicm9sZSI6IiJ9.ZE5EcQOhrLWAOOEfuZw56AEK2yMt99i4g_HvBiCuXO8"
+
+
+### 用户绑定角色
+POST http://{{host}}:{{port}}/users/{{userId}}/roles
+Content-Type: application/json
+
+{
+  "role_ids": [1]
+}

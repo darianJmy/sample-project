@@ -27,5 +27,8 @@ func (ro *roleRouter) initRoutes(httpEngine *gin.Engine) {
 		roleRoute.DELETE("/:roleId", ro.deleteRole)
 		roleRoute.GET("/:roleId", ro.getRole)
 		roleRoute.GET("", ro.listRoles)
+
+		roleRoute.POST("/:roleId/menus", ro.roleBindMenus)
+		roleRoute.DELETE("/:roleId/menus", ro.roleUnBindMenus)
 	}
 }

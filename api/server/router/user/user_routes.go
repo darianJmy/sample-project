@@ -179,3 +179,57 @@ func (u *userRouter) resetPassword(c *gin.Context) {
 
 	httputils.SetSuccess(c, r)
 }
+
+func (u *userRouter) userBindRoles(c *gin.Context) {
+	r := httputils.NewResponse()
+
+	var (
+		idMeta  IdMeta
+		roleIds types.Roles
+		err     error
+	)
+
+	if err = c.ShouldBindUri(&idMeta); err != nil {
+		httputils.SetFailed(c, r, err)
+		return
+	}
+
+	if err = c.ShouldBindJSON(&roleIds); err != nil {
+		httputils.SetFailed(c, r, err)
+		return
+	}
+
+	if err = u.c.User().UserBindRole(c, idMeta.UserId, roleIds.RoleIds); err != nil {
+		httputils.SetFailed(c, r, err)
+		return
+	}
+
+	httputils.SetSuccess(c, r)
+}
+
+func (u *userRouter) userUnBindRoles(c *gin.Context) {
+	r := httputils.NewResponse()
+
+	var (
+		idMeta  IdMeta
+		roleIds types.Roles
+		err     error
+	)
+
+	if err = c.ShouldBindUri(&idMeta); err != nil {
+		httputils.SetFailed(c, r, err)
+		return
+	}
+
+	if err = c.ShouldBindJSON(&roleIds); err != nil {
+		httputils.SetFailed(c, r, err)
+		return
+	}
+
+	if err = u.c.User().UserUnBindRole(c, idMeta.UserId, roleIds.RoleIds); err != nil {
+		httputils.SetFailed(c, r, err)
+		return
+	}
+
+	httputils.SetSuccess(c, r)
+}

@@ -34,5 +34,9 @@ func (u *userRouter) initRoutes(httpEngine *gin.Engine) {
 
 		userRoute.PUT("/change/password/:userId", u.changePassword)
 		userRoute.PUT("/reset/password/:userId", u.resetPassword)
+
+		userRoute.POST("/:userId/roles", u.userBindRoles)
+		userRoute.DELETE("/:userId/roles", u.userUnBindRoles)
+
 	}
 }

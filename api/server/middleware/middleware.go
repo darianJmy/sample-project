@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 
 	"sample-project/cmd/app/options"
@@ -8,12 +9,14 @@ import (
 )
 
 type middleware struct {
-	c controller.SampleInterface
+	c        controller.SampleInterface
+	enforcer *casbin.Enforcer
 }
 
 func NewMiddlewares(o *options.ServerRunOptions) {
 	m := &middleware{
-		o.Control,
+		c:        o.Control,
+		enforcer: o.Factory.Enforcer.GetEnforcer(),
 	}
 
 	m.initMiddlewares(o.HttpEngine)

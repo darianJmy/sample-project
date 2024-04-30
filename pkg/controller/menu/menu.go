@@ -26,17 +26,21 @@ type menu struct {
 
 func (m *menu) Create(ctx context.Context, menu *types.Menu) (*types.Menu, error) {
 	mm, err := m.factory.Menu.Create(ctx, &model.Menu{
-		URL:  menu.URL,
-		Name: menu.Name,
+		URL:    menu.URL,
+		Name:   menu.Name,
+		Method: menu.Method,
+		Memo:   menu.Description,
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	return &types.Menu{
-		Id:   int64(mm.ID),
-		URL:  mm.URL,
-		Name: mm.Name,
+		Id:          int64(mm.ID),
+		URL:         mm.URL,
+		Name:        mm.Name,
+		Method:      mm.Method,
+		Description: mm.Memo,
 	}, nil
 }
 
@@ -50,10 +54,17 @@ func (m *menu) Delete(ctx context.Context, menuId int64) (*types.Menu, error) {
 		return nil, err
 	}
 
+	// 清除 rules 规则
+	if err = m.factory.Enforcer.DeleteRolePermission(mm.URL, mm.Method); err != nil {
+		return nil, err
+	}
+
 	return &types.Menu{
-		Id:   int64(mm.ID),
-		URL:  mm.URL,
-		Name: mm.Name,
+		Id:          int64(mm.ID),
+		URL:         mm.URL,
+		Name:        mm.Name,
+		Method:      mm.Method,
+		Description: mm.Memo,
 	}, nil
 }
 
@@ -64,9 +75,11 @@ func (m *menu) Get(ctx context.Context, menuId int64) (*types.Menu, error) {
 	}
 
 	return &types.Menu{
-		Id:   int64(mm.ID),
-		URL:  mm.URL,
-		Name: mm.Name,
+		Id:          int64(mm.ID),
+		URL:         mm.URL,
+		Name:        mm.Name,
+		Method:      mm.Method,
+		Description: mm.Memo,
 	}, nil
 }
 
@@ -80,9 +93,11 @@ func (m *menu) List(ctx context.Context) ([]types.Menu, error) {
 
 	for _, mm := range mmm {
 		menus = append(menus, types.Menu{
-			Id:   int64(mm.ID),
-			URL:  mm.URL,
-			Name: mm.Name,
+			Id:          int64(mm.ID),
+			URL:         mm.URL,
+			Name:        mm.Name,
+			Method:      mm.Method,
+			Description: mm.Memo,
 		})
 	}
 

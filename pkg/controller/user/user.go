@@ -3,11 +3,13 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"sample-project/cmd/app/config"
 	"sample-project/pkg/db"
 	"sample-project/pkg/db/model"
 	"sample-project/pkg/types"
+	"sample-project/tools"
 )
 
 type UserGetter interface {
@@ -31,8 +33,8 @@ type Interface interface {
 	GetUserRole(ctx context.Context, roleId int64) error
 	ListUserRole(ctx context.Context, roleId int64) error
 
-	UserBindRole(ctx context.Context, roleId int64, menus []model.Menu) error
-	UserUnBindRole(ctx context.Context, roleId int64, menus []model.Menu) error
+	UserBindRole(ctx context.Context, userId int64, roleIds []int64) error
+	UserUnBindRole(ctx context.Context, roleId int64, roleIds []int64) error
 }
 
 type user struct {
@@ -127,12 +129,21 @@ func (u *user) Login(ctx context.Context, user *types.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("拿到了uu")
 
 	if err = bcrypt.CompareHashAndPassword([]byte(uu.Password), []byte(user.Password)); err != nil {
 		return "", errors.New("the password is incorrect")
 	}
 
-	return "1111111111111", nil
+	fmt.Println("准备处理解析")
+
+	xx, err := tools.GenerateToken(int64(uu.ID), uu.Name)
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println(xx)
+	return xx, nil
 }
 
 func (u *user) ChangePassword(ctx context.Context, userId int64, pwd *types.Password) (*types.User, error) {
@@ -209,11 +220,28 @@ func (u *user) ListUserRole(ctx context.Context, roleId int64) error {
 	return nil
 }
 
-func (u *user) UserBindRole(ctx context.Context, roleId int64, menus []model.Menu) error {
+func (u *user) UserBindRole(ctx context.Context, userId int64, roleIds []int64) error {
+	_, err := u.factory.Role.FindByWhere(ctx, "id in ?", roleIds)
+	if err != nil {
+		return err
+	}
+
+	err = u.factory.Enforcer.UserBindRoles(userId, roleIds...)
+	if err != nil {
+		return err
+	}
+
+	for _, roleId := range roleIds {
+		if _, err = u.factory.UserRole.Create(ctx, &model.UserRole{UserID: userId, RoleID: roleId}); err != nil {
+			_ = u.factory.Enforcer.DeleteRole(roleId)
+			return err
+		}
+	}
+
 	return nil
 }
 
-func (u *user) UserUnBindRole(ctx context.Context, roleId int64, menus []model.Menu) error {
+func (u *user) UserUnBindRole(ctx context.Context, roleId int64, roleIds []int64) error {
 	return nil
 }
 

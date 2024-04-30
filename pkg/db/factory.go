@@ -9,7 +9,6 @@ import (
 type ShareDaoFactory struct {
 	User     *Curd[*model.User]
 	Role     *Curd[*model.Role]
-	Rule     *Curd[*model.Rule]
 	UserRole *Curd[*model.UserRole]
 	Menu     *Curd[*model.Menu]
 	RoleMenu *Curd[*model.RoleMenu]
@@ -23,7 +22,6 @@ func NewDaoFactory(db *gorm.DB, migrate bool) (*ShareDaoFactory, error) {
 		if err := newMigrator(db).CreateTables(
 			&model.User{},
 			&model.Role{},
-			&model.Rule{},
 			&model.UserRole{},
 			&model.Menu{},
 			&model.RoleMenu{},
@@ -40,7 +38,6 @@ func NewDaoFactory(db *gorm.DB, migrate bool) (*ShareDaoFactory, error) {
 	return &ShareDaoFactory{
 		User:     newCurd(&model.User{}, db),
 		Role:     newCurd(&model.Role{}, db),
-		Rule:     newCurd(&model.Rule{}, db),
 		UserRole: newCurd(&model.UserRole{}, db),
 		Menu:     newCurd(&model.Menu{}, db),
 		RoleMenu: newCurd(&model.RoleMenu{}, db),

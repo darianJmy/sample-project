@@ -112,3 +112,36 @@ func (ro *roleRouter) listRoles(c *gin.Context) {
 
 	httputils.SetSuccess(c, r)
 }
+
+func (ro *roleRouter) roleBindMenus(c *gin.Context) {
+	r := httputils.NewResponse()
+
+	var (
+		idMeta IdMeta
+		menus  types.Menus
+		err    error
+	)
+
+	if err = c.ShouldBindUri(&idMeta); err != nil {
+		httputils.SetFailed(c, r, err)
+		return
+	}
+
+	if err = c.ShouldBindJSON(&menus); err != nil {
+		httputils.SetFailed(c, r, err)
+		return
+	}
+
+	if err = ro.c.Role().RoleBindMenu(c, idMeta.RoleId, menus.MenuIds); err != nil {
+		httputils.SetFailed(c, r, err)
+		return
+	}
+
+	httputils.SetSuccess(c, r)
+}
+
+func (ro *roleRouter) roleUnBindMenus(c *gin.Context) {
+	r := httputils.NewResponse()
+
+	httputils.SetSuccess(c, r)
+}

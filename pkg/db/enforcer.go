@@ -1,7 +1,6 @@
 package db
 
 import (
-	"context"
 	"strconv"
 
 	"github.com/casbin/casbin/v2"
@@ -17,8 +16,12 @@ type csEnforcer struct {
 	db       *gorm.DB
 }
 
-// AddRoleForUser 分配用户角色
-func (c *csEnforcer) AddRoleForUser(ctx context.Context, userid int64, roleIds []int64) error {
+// GetEnforcer 获取直接操作
+func (c *csEnforcer) GetEnforcer() *casbin.Enforcer {
+	return c.enforcer
+}
+
+func (c *csEnforcer) UserBindRoles(userid int64, roleIds ...int64) error {
 	uidStr := strconv.FormatInt(userid, 10)
 
 	ok, err := c.enforcer.DeleteRolesForUser(uidStr)
@@ -26,8 +29,8 @@ func (c *csEnforcer) AddRoleForUser(ctx context.Context, userid int64, roleIds [
 		return err
 	}
 
-	for _, v := range roleIds {
-		ok, err = c.enforcer.AddRoleForUser(uidStr, strconv.FormatInt(v, 10))
+	for _, roleId := range roleIds {
+		ok, err = c.enforcer.AddRoleForUser(uidStr, strconv.FormatInt(roleId, 10))
 		if err != nil || !ok {
 			return err
 		}
@@ -36,36 +39,23 @@ func (c *csEnforcer) AddRoleForUser(ctx context.Context, userid int64, roleIds [
 	return nil
 }
 
-// SetRolePermission 设置角色权限
-func (c *csEnforcer) SetRolePermission(ctx context.Context, roleId int64, menus *[]model.Menu) (bool, error) {
-	ok, err := c.enforcer.DeletePermissionsForUser(strconv.FormatInt(roleId, 10))
-	if err != nil || !ok {
-		return false, err
-	}
-
-	_, err = c.setRolePermission(roleId, menus)
+func (c *csEnforcer) RoleBindMenus(roleId int64, menus []*model.Menu) (bool, error) {
+	_, err := c.enforcer.DeletePermissionsForUser(strconv.FormatInt(roleId, 10))
 	if err != nil {
 		return false, err
 	}
-	return true, nil
-}
 
-// 设置角色权限
-func (c *csEnforcer) setRolePermission(roleId int64, menus *[]model.Menu) (bool, error) {
-	for _, v := range *menus {
-		if v.MenuType == 2 || v.MenuType == 3 {
-			ok, err := c.enforcer.AddPermissionForUser(strconv.FormatInt(roleId, 10), v.URL, v.Method)
-			if err != nil || !ok {
-				return ok, err
-			}
+	for _, v := range menus {
+		ok, err := c.enforcer.AddPermissionForUser(strconv.FormatInt(roleId, 10), v.URL, v.Method)
+		if err != nil || !ok {
+			return ok, err
 		}
 	}
 
-	return false, nil
+	return true, nil
 }
 
-// DeleteRole 删除角色
-func (c *csEnforcer) DeleteRole(ctx context.Context, roleId int64) error {
+func (c *csEnforcer) DeleteRole(roleId int64) error {
 	ok, err := c.enforcer.DeletePermissionsForUser(strconv.FormatInt(roleId, 10))
 	if err != nil || !ok {
 		return err
@@ -79,8 +69,7 @@ func (c *csEnforcer) DeleteRole(ctx context.Context, roleId int64) error {
 	return nil
 }
 
-// DeleteRolePermission 删除角色权限
-func (c *csEnforcer) DeleteRolePermission(ctx context.Context, resource ...string) error {
+func (c *csEnforcer) DeleteRolePermission(resource ...string) error {
 	ok, err := c.enforcer.DeletePermission(resource...)
 	if err != nil || !ok {
 		return err

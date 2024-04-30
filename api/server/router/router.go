@@ -2,6 +2,7 @@ package router
 
 import (
 	"sample-project/api/server/middleware"
+	"sample-project/api/server/router/info"
 	"sample-project/api/server/router/menu"
 	"sample-project/api/server/router/role"
 	"sample-project/api/server/router/user"
@@ -18,6 +19,7 @@ func InstallRouters(o *options.ServerRunOptions) {
 		user.NewRouter,
 		role.NewRouter,
 		menu.NewRouter,
+		info.NewRouter,
 	}
 
 	install(o, fs...)
